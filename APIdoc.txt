@@ -1,0 +1,123 @@
+# API Documentation
+
+## 1. API Tạo Người Dùng
+### Method: POST
+### URL Postman: http://localhost:8080/api/user/create
+### Request: 
+	{
+    		"username":"thai",
+    		"password":"hello"
+   	}
+
+### Response: User created successfully
+
+## 2. API get profile người dùng
+### Method: GET 
+### URL Postman: http://localhost:8080/api/user/get/{username}
+### Response: 
+	{
+    	"username": "thai",
+    	"avatarUrl": null,
+    	"lotusPoint": 56
+	}
+
+## 3. API get danh sách các trạng thái các ngày điểm danh.
+### Method: GET
+### URL Postman: http://localhost:8080/api/attendance/status?username={username}&month=05&year=2025
+### Param: username,month,year
+### Response:
+{
+    "attendedDays": [
+        "2025-05-06",
+        "2025-05-07",
+        "2025-05-17"
+    ],
+    "missedDays": [
+        "2025-05-01",
+        "2025-05-02",
+        "2025-05-03",
+        "2025-05-04",
+        "2025-05-05",
+        "2025-05-08",
+        "2025-05-09",
+        "2025-05-10",
+        "2025-05-11",
+        "2025-05-12",
+        "2025-05-13",
+        "2025-05-14",
+        "2025-05-15",
+        "2025-05-16",
+        "2025-05-18",
+        "2025-05-19",
+        "2025-05-20",
+        "2025-05-21",
+        "2025-05-22",
+        "2025-05-23",
+        "2025-05-24",
+        "2025-05-25",
+        "2025-05-26",
+        "2025-05-27",
+        "2025-05-28",
+        "2025-05-29",
+        "2025-05-30",
+        "2025-05-31"
+    ]
+}
+
+## 4. API điểm danh
+### Method: POST
+### URL Postman: http://localhost:8080/api/attendance/check-in?username={username}&checkinDate=2025-04-18&checkinTime=20:00
+### Param: username, checkinDate, checkinTime
+### Mô tả: Các tham số đầu vào dùng để test chức năng của api điểm danh hàng ngày
+### Response:
+{
+    "message": "Điểm danh thành công"
+}
+
+## 5. API Lịch sử cộng điểm
+### Method: GET
+### URL Postman: http://localhost:8080/api/lotus-point/history?username={username}&page=0&size=2
+### Response: 
+{
+    "totalItems": 12,
+    "data": [
+        {
+            "id": 13,
+            "user": {
+                "id": 2,
+                "username": "thai",
+                "password": "$2a$10$0xH2FSWad7X.vR8IP4QUu.8kUdCo.3xeTpkBJpFtvvcy2/nShiKWC",
+                "lotusPoint": 57,
+                "avatarUrl": null
+            },
+            "points": 1,
+            "type": "ADD",
+            "createdAt": "2025-04-16T20:00:00",
+            "note": null
+        },
+        {
+            "id": 12,
+            "user": {
+                "id": 2,
+                "username": "thai",
+                "password": "$2a$10$0xH2FSWad7X.vR8IP4QUu.8kUdCo.3xeTpkBJpFtvvcy2/nShiKWC",
+                "lotusPoint": 57,
+                "avatarUrl": null
+            },
+            "points": 3,
+            "type": "MINUS",
+            "createdAt": "2025-03-27T14:24:56",
+            "note": null
+        }
+    ],
+    "totalPages": 6,
+    "pageSize": 2,
+    "currentPage": 0
+}
+
+## 6. API Trừ điểm
+### Method: POST
+### URL Postman: http://localhost:8080/api/user/minus-points?username={username}&points=2
+### Response: "Đã trừ 2 điểm cho thai"
+
+
