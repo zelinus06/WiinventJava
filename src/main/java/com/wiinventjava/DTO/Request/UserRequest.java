@@ -1,4 +1,4 @@
-package com.wiinventjava.DTO;
+package com.wiinventjava.DTO.Request;
 
 import lombok.Data;
 

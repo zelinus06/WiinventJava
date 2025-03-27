@@ -1,79 +1,13 @@
 {
   "databaseChangeLog": [
     {
-      "changeSet": {
-        "id": "1",
-        "author": "admin",
-        "changes": [
-          {
-            "createTable": {
-              "tableName": "users",
-              "columns": [
-                {
-                  "column": {
-                    "name": "id",
-                    "type": "BIGINT",
-                    "autoIncrement": true,
-                    "constraints": {
-                      "primaryKey": true,
-                      "nullable": false
-                    }
-                  }
-                },
-                {
-                  "column": {
-                    "name": "username",
-                    "type": "VARCHAR(100)",
-                    "constraints": {
-                      "nullable": false,
-                      "unique": true
-                    }
-                  }
-                },
-                {
-                  "column": {
-                    "name": "password",
-                    "type": "VARCHAR(255)",
-                    "constraints": {
-                      "nullable": false
-                    }
-                  }
-                },
-                {
-                  "column": {
-                    "name": "lotus_point",
-                    "type": "INT",
-                    "constraints": {
-                      "nullable": false
-                    }
-                  }
-                },
-                {
-                  "column": {
-                    "name": "avatar_url",
-                    "type": "VARCHAR(255)",
-                    "constraints": {
-                      "nullable": true
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "createIndex": {
-              "indexName": "idx_users_lotus_point",
-              "tableName": "users",
-              "columns": [
-                {
-                  "column": {
-                    "name": "lotus_point"
-                  }
-                }
-              ]
-            }
-          }
-        ]
+      "include": {
+        "file": "db/changelog/001_create_users.json"
+      }
+    },
+    {
+      "include": {
+        "file": "db/changelog/002_create_lotusPointHistory.json"
       }
     }
   ]
