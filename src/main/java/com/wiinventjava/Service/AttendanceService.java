@@ -8,8 +8,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -30,17 +34,21 @@ import static com.wiinventjava.Enums.AttendanceMessage.*;
 @RequiredArgsConstructor
 @Slf4j
 public class AttendanceService {
-    private final UsersRepo userRepository;
-    private final LotusPointHistoryRepo lotusPointHistoryRepository;
+    @Autowired
+    private UsersRepo userRepository;
+    @Autowired
+    private LotusPointHistoryRepo lotusPointHistoryRepository;
+    @Autowired
+    private CacheManager cacheManager;
+
     private final RedisTemplate<String, Object> redisTemplate;
     private final RedissonClient redissonClient;
-
     private static final String ATTENDANCE_KEY = "attendance:";
     private static final String LOCK_KEY = "attendance-lock:";
     private static final List<Integer> LOTUS_POINTS = List.of(1, 2, 3, 5, 8, 13, 21);
     private static final int MAX_ATTENDANCE_DAYS = 7;
 
-    @Transactional
+    @Transactional()
     public String checkIn(String username,LocalDate checkInDate, LocalTime checkInTime) {
         // Kiểm tra thời gian điểm danh
         if (!isValidCheckInTime(checkInTime)) {
@@ -54,10 +62,10 @@ public class AttendanceService {
         String redisKey = ATTENDANCE_KEY + username + ":" + checkInDate.getYear()+ "-" + checkInDate.getMonthValue();
         RLock lock = redissonClient.getLock(LOCK_KEY + username);
 
-        try {
-            if (!lock.tryLock(3, 3, TimeUnit.SECONDS)) {
-                return SYSTEM_BUSY.getMessage();
-            }
+//        try {
+//            if (!lock.tryLock(5, 4, TimeUnit.SECONDS)) {
+//                return SYSTEM_BUSY.getMessage();
+//            }
 
             // Lấy danh sách ngày điểm danh trong Redis
             Set<Object> attendanceDays = redisTemplate.opsForSet().members(redisKey);
@@ -95,12 +103,13 @@ public class AttendanceService {
 
             // Thêm ngày điểm danh vào Redis
             redisTemplate.opsForSet().add(redisKey, today);
+            clearUserPointHistoryCache(username);
 
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } finally {
-            lock.unlock();
-        }
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//        } finally {
+//            lock.unlock();
+//        }
         return CHECK_IN_SUCCESS.getMessage();
     }
 
@@ -140,6 +149,14 @@ public class AttendanceService {
     private boolean isValidCheckInTime(LocalTime checkInTime) {
         return (checkInTime.isAfter(LocalTime.of(8, 59)) && checkInTime.isBefore(LocalTime.of(11, 1))) ||
                 (checkInTime.isAfter(LocalTime.of(18, 59)) && checkInTime.isBefore(LocalTime.of(21, 1)));
+    }
+
+    // Xóa cache user
+    public void clearUserPointHistoryCache(String username) {
+        Cache cache = cacheManager.getCache("pointHistory");
+        for (int page = 0; page < 10; page++) {
+            cache.evict(username + "-" + page);
+        }
     }
 }
 

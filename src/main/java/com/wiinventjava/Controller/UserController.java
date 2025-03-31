@@ -34,7 +34,7 @@ public class UserController {
     @PostMapping("/minus-points")
     public ResponseEntity<String> deductPoints(
             @RequestParam String username,
-            @RequestParam int points) {
+            @RequestParam int points) throws InterruptedException {
         userService.minusPoints(username, points);
         return ResponseEntity.ok("Đã trừ " + points + " điểm cho " + username);
     }
